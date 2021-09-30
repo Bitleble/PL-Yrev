@@ -1,5 +1,3 @@
-print("Zadanie 1")
-
 a = int(input(" a = "))
 b = int(input(" b = "))
 if a <= b:
