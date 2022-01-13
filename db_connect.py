@@ -4,8 +4,8 @@ from tkinter import *
 from tkinter import ttk, scrolledtext
 from textwrap import wrap
 from matplotlib import pyplot as plt
-# В день может быть совершена одна покупка товара из одной категории , всего дне 365 ,
-conn = sqlite3.connect('Build0.6.db')
+# В день может быть совершена одна покупка товара из одной категории , всего дней 365 ,
+conn = sqlite3.connect('Year1.db')
 cur = conn.cursor()
 cur.execute("""CREATE TABLE IF NOT EXISTS groups(
    kod INT,
@@ -20,70 +20,6 @@ c = []
 summall = []
 summcode = []
 summkat = []
-def gruppchange():
-    dannie = (int(txt.get()), int(txt1.get()), txt2.get(),txt3.get(),int(txt4.get()))
-    cur.execute("insert into groups VALUES(?,?,?,?,?);", dannie)
-    conn.commit()
-
-def info():
-    tovt = txtt.get()
-    vetv1 = Tk()
-    vetv1.geometry('400x400')
-    vibort = """select * from groups where tovar = ?"""
-    cur.execute(vibort, (tovt,))
-    records = cur.fetchall()
-    textt = scrolledtext.ScrolledText(vetv1, width=30, height=50)
-    textt.grid(column=10, row=10)
-    for row in records:
-        res = "Код: {}".format(row[0]) + '\n' + "Категория:{}".format(row[2])+'\n' + '\n'
-        textt.insert(1.0, res)
-        break
-    vetv1.mainloop()
-
-def vivodlingr():
-    den = int(txtk.get())
-    den1 = int(txtk1.get())
-    tov = txtk2.get()
-    root = Tk()
-    root.geometry('400x400')
-    vibor = """select * from groups where Den = ? and kategor = ?"""
-    text = scrolledtext.ScrolledText(root, width=30, height=50)
-    text.grid(column=10, row=10)
-    for i in range(den,den1+1):
-      cur.execute(vibor, (i,tov))
-      records = cur.fetchall()
-      for row in records:
-        res = "Код: {}".format(row[0])+'\n'+"День:{}".format(row[1])+'\n'+"Категория:{}".format(row[2])+'\n'+"Товар:{}".format(row[3])+'\n'+'\n'
-        text.insert(1.0, res)
-    root.mainloop()
-
-def graph1():
-    vibor = """select * from groups where Den = ?"""
-    for i in range(365):
-      cur.execute(vibor, (i,))
-      records = cur.fetchall()
-      for row in records:
-        b.append(row[1])
-        c.append(row[4])
-    plt.title("Расходы")
-    plt.xlabel('Дни года')
-    plt.ylabel('Потраченная сумма в рублях')
-    plt.plot(b, c)
-    plt.show()
-
-def graph2():
-    vibor = """select * from groups where Den = ?"""
-    for i in range(365):
-      cur.execute(vibor, (i,))
-      records = cur.fetchall()
-      for row in records:
-        b.append(row[1])
-        c.append(row[4])
-    plt.bar(b, c, color='blue')
-    plt.title("Расходы")
-    plt.xlabel('Дни года')
-    plt.ylabel('Потраченная сумма в рублях')
-    plt.show()
 
 def shellSort(array,c):
     n = len(array)
@@ -104,10 +40,109 @@ def shellSort(array,c):
         interval = 2**k -1
     return array, c
 
+def dub(b,c):
+    lenn = len(b)
+    for i in range(lenn):
+        if b[i] == b[i-1]:
+            cswap = i-1
+            c[cswap+1] = c[cswap] + c[cswap+1]
+            b[cswap] = 0
+            c[cswap] = 0
+    shellSort(b, c)
+    b.reverse()
+    c.reverse()
+    for x in b:
+        if x == 0:
+            b.remove(0)
+            c.remove(0)
+    return b,c
+
+def gruppchange():
+    dannie = (int(txt.get()), int(txt1.get()), txt2.get(),txt3.get(),int(txt4.get()))
+    cur.execute("insert into groups VALUES(?,?,?,?,?);", dannie)
+    conn.commit()
+
+def info():
+    tovt = txtt.get()
+    vetv1 = Tk()
+    vetv1.title('Информация по товару')
+    vetv1.geometry('400x400')
+    vibort = """select * from groups where tovar = ?"""
+    cur.execute(vibort, (tovt,))
+    records = cur.fetchall()
+    textt = scrolledtext.ScrolledText(vetv1, width=30, height=50)
+    textt.grid(column=10, row=10)
+    for row in records:
+        res = "Код: {}".format(row[0]) + '\n' + "Категория:{}".format(row[2])+'\n' + '\n'
+        textt.insert(1.0, res)
+        break
+    vetv1.mainloop()
+
+def vivodlingr():
+    den = int(txtk.get())
+    den1 = int(txtk1.get())
+    tov = txtk2.get()
+    root = Tk()
+    root.title('Сортировка по дням и категории')
+    root.geometry('400x400')
+    vibor = """select * from groups where Den = ? and kategor = ?"""
+    text = scrolledtext.ScrolledText(root, width=30, height=50)
+    text.grid(column=10, row=10)
+    for i in range(den,den1+1):
+      cur.execute(vibor, (i,tov))
+      records = cur.fetchall()
+      for row in records:
+        res = "Код: {}".format(row[0])+'\n'+"День:{}".format(row[1])+'\n'+"Категория:{}".format(row[2])+'\n'+"Товар:{}".format(row[3])+'\n'+'\n'
+        text.insert(1.0, res)
+    root.mainloop()
+
+def graph1():
+    vibor = """select * from groups where Den = ?"""
+    for i in range(365):
+      cur.execute(vibor, (i,))
+      records = cur.fetchall()
+      for row in records:
+        b.append(row[1])
+        c.append(row[4])
+    shellSort(b, c)
+    b.reverse()
+    c.reverse()
+    dub(b, c)
+    plt.title("Расходы")
+    plt.xlabel('Дни года')
+    plt.ylabel('Потраченная сумма в рублях')
+    plt.plot(b, c)
+    plt.show()
+    b.clear()
+    c.clear()
+
+def graph2():
+    vibor = """select * from groups where Den = ?"""
+    for i in range(365):
+      cur.execute(vibor, (i,))
+      records = cur.fetchall()
+      for row in records:
+        b.append(row[1])
+        c.append(row[4])
+    shellSort(b,c)
+    b.reverse()
+    c.reverse()
+    dub(b, c)
+    plt.bar(b, c, color='blue')
+    plt.title("Расходы")
+    plt.xlabel('Дни года')
+    plt.ylabel('Потраченная сумма в рублях')
+    plt.show()
+    b.clear()
+    c.clear()
+
+
+
 def tablic():
     vetv2 = Tk()
+    vetv2.title('Таблица расходов')
     vetv2.geometry('400x400')
-    textt1 = scrolledtext.ScrolledText(vetv2, width=30, height=50)
+    textt1 = scrolledtext.ScrolledText(vetv2, width=30, height=30)
     textt1.grid(column=10, row=10)
     vibor = """select * from groups where Den = ?"""
     for i in range(365):
@@ -119,12 +154,16 @@ def tablic():
     shellSort(b,c)
     b.reverse()
     c.reverse()
-    res = 'День | Затраты(в рублях)'+'\n'
+    dub(b, c)
+    res = 'День | Затраты(в рублях)' + '\n'
     textt1.insert(1.0, res)
     for i in range(len(b)):
-        res1 = str(b[i])+'  |  '+str(c[i])+'\n'
-        textt1.insert(2.0,res1)
+        res1 = str(b[i]) + '  |  ' + str(c[i]) + '\n'
+        textt1.insert(2.0, res1)
+    b.clear()
+    c.clear()
     vetv2.mainloop()
+
 
 def summall1():
     vibor = """select * from groups where Den = ?"""
@@ -161,8 +200,8 @@ def summkategor():
 
 
 window = Tk()
-window.geometry('625x500')
-window["bg"] = "blue"
+window.title('Учёт расходов')
+window.geometry('625x450')
 tab_control = ttk.Notebook(window)
 tab1 = ttk.Frame(tab_control)
 tab2 = ttk.Frame(tab_control)
