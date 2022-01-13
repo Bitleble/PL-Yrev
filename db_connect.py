@@ -4,6 +4,7 @@ from tkinter import *
 from tkinter import ttk, scrolledtext
 from textwrap import wrap
 from matplotlib import pyplot as plt
+
 # В день может быть совершена одна покупка товара из одной категории , всего дней 365 ,
 conn = sqlite3.connect('Year1.db')
 cur = conn.cursor()
@@ -21,10 +22,39 @@ summall = []
 summcode = []
 summkat = []
 
-def shellSort(array,c):
+
+def deletepokodu():
+    vibort = '''delete FROM groups WHERE kod = ? '''
+    tovt = int(txt.get())
+    cur.execute(vibort, (tovt,))
+    conn.commit()
+
+
+def deletepodnu():
+    vibort = '''delete FROM groups WHERE Den = ? '''
+    tovt = int(txt1.get())
+    cur.execute(vibort, (tovt,))
+    conn.commit()
+
+
+def deletepokat():
+    vibort = '''delete FROM groups WHERE kategor = ? '''
+    tovt = txt2.get()
+    cur.execute(vibort, (tovt,))
+    conn.commit()
+
+
+def deletetov():
+    vibort = '''delete FROM groups WHERE tovar = ? '''
+    tovt = txt3.get()
+    cur.execute(vibort, (tovt,))
+    conn.commit()
+
+
+def shellSort(array, c):
     n = len(array)
     k = int(math.log2(n))
-    interval = 2**k -1
+    interval = 2 ** k - 1
     while interval > 0:
         for i in range(interval, n):
             temp = array[i]
@@ -32,20 +62,21 @@ def shellSort(array,c):
             j = i
             while j >= interval and array[j - interval] > temp:
                 array[j] = array[j - interval]
-                c[j] = c[j-interval]
+                c[j] = c[j - interval]
                 j -= interval
             array[j] = temp
             c[j] = temp1
         k -= 1
-        interval = 2**k -1
+        interval = 2 ** k - 1
     return array, c
 
-def dub(b,c):
+
+def dub(b, c):
     lenn = len(b)
     for i in range(lenn):
-        if b[i] == b[i-1]:
-            cswap = i-1
-            c[cswap+1] = c[cswap] + c[cswap+1]
+        if b[i] == b[i - 1]:
+            cswap = i - 1
+            c[cswap + 1] = c[cswap] + c[cswap + 1]
             b[cswap] = 0
             c[cswap] = 0
     shellSort(b, c)
@@ -55,12 +86,14 @@ def dub(b,c):
         if x == 0:
             b.remove(0)
             c.remove(0)
-    return b,c
+    return b, c
+
 
 def gruppchange():
-    dannie = (int(txt.get()), int(txt1.get()), txt2.get(),txt3.get(),int(txt4.get()))
+    dannie = (int(txt.get()), int(txt1.get()), txt2.get(), txt3.get(), int(txt4.get()))
     cur.execute("insert into groups VALUES(?,?,?,?,?);", dannie)
     conn.commit()
+
 
 def info():
     tovt = txtt.get()
@@ -73,10 +106,11 @@ def info():
     textt = scrolledtext.ScrolledText(vetv1, width=30, height=50)
     textt.grid(column=10, row=10)
     for row in records:
-        res = "Код: {}".format(row[0]) + '\n' + "Категория:{}".format(row[2])+'\n' + '\n'
+        res = "Код: {}".format(row[0]) + '\n' + "Категория:{}".format(row[2]) + '\n' + '\n'
         textt.insert(1.0, res)
         break
     vetv1.mainloop()
+
 
 def vivodlingr():
     den = int(txtk.get())
@@ -88,26 +122,32 @@ def vivodlingr():
     vibor = """select * from groups where Den = ? and kategor = ?"""
     text = scrolledtext.ScrolledText(root, width=30, height=50)
     text.grid(column=10, row=10)
-    for i in range(den,den1+1):
-      cur.execute(vibor, (i,tov))
-      records = cur.fetchall()
-      for row in records:
-        res = "Код: {}".format(row[0])+'\n'+"День:{}".format(row[1])+'\n'+"Категория:{}".format(row[2])+'\n'+"Товар:{}".format(row[3])+'\n'+'\n'
-        text.insert(1.0, res)
+    for i in range(den, den1 + 1):
+        cur.execute(vibor, (i, tov))
+        records = cur.fetchall()
+        for row in records:
+            res = "Код: {}".format(row[0]) + '\n' + "День:{}".format(row[1]) + '\n' + "Категория:{}".format(
+                row[2]) + '\n' + "Товар:{}".format(row[3]) + '\n' + '\n'
+            text.insert(1.0, res)
     root.mainloop()
+
 
 def graph1():
     vibor = """select * from groups where Den = ?"""
     for i in range(365):
-      cur.execute(vibor, (i,))
-      records = cur.fetchall()
-      for row in records:
-        b.append(row[1])
-        c.append(row[4])
+        cur.execute(vibor, (i,))
+        records = cur.fetchall()
+        for row in records:
+            b.append(row[1])
+            c.append(row[4])
     shellSort(b, c)
     b.reverse()
     c.reverse()
     dub(b, c)
+    for x in b and c:
+        if x == 0:
+            b.remove(x)
+            c.remove(x)
     plt.title("Расходы")
     plt.xlabel('Дни года')
     plt.ylabel('Потраченная сумма в рублях')
@@ -116,18 +156,23 @@ def graph1():
     b.clear()
     c.clear()
 
+
 def graph2():
     vibor = """select * from groups where Den = ?"""
     for i in range(365):
-      cur.execute(vibor, (i,))
-      records = cur.fetchall()
-      for row in records:
-        b.append(row[1])
-        c.append(row[4])
-    shellSort(b,c)
+        cur.execute(vibor, (i,))
+        records = cur.fetchall()
+        for row in records:
+            b.append(row[1])
+            c.append(row[4])
+    shellSort(b, c)
     b.reverse()
     c.reverse()
     dub(b, c)
+    for x in b and c:
+        if x == 0:
+            b.remove(x)
+            c.remove(x)
     plt.bar(b, c, color='blue')
     plt.title("Расходы")
     plt.xlabel('Дни года')
@@ -135,7 +180,6 @@ def graph2():
     plt.show()
     b.clear()
     c.clear()
-
 
 
 def tablic():
@@ -146,17 +190,25 @@ def tablic():
     textt1.grid(column=10, row=10)
     vibor = """select * from groups where Den = ?"""
     for i in range(365):
-      cur.execute(vibor, (i,))
-      records = cur.fetchall()
-      for row in records:
-        b.append(row[1])
-        c.append(row[4])
-    shellSort(b,c)
+        cur.execute(vibor, (i,))
+        records = cur.fetchall()
+        for row in records:
+            b.append(row[1])
+            c.append(row[4])
+    shellSort(b, c)
     b.reverse()
     c.reverse()
     dub(b, c)
+    for x in b and c:
+        if x == 0:
+            b.remove(x)
+            c.remove(x)
     res = 'День | Затраты(в рублях)' + '\n'
     textt1.insert(1.0, res)
+    for x in b and c:
+        if x == 0:
+            b.remove(x)
+            c.remove(x)
     for i in range(len(b)):
         res1 = str(b[i]) + '  |  ' + str(c[i]) + '\n'
         textt1.insert(2.0, res1)
@@ -168,12 +220,13 @@ def tablic():
 def summall1():
     vibor = """select * from groups where Den = ?"""
     for i in range(365):
-      cur.execute(vibor, (i,))
-      records = cur.fetchall()
-      for row in records:
-        summall.append(row[4])
-    txts2.insert(0,sum(summall))
+        cur.execute(vibor, (i,))
+        records = cur.fetchall()
+        for row in records:
+            summall.append(row[4])
+    txts2.insert(0, sum(summall))
     summall.clear()
+
 
 def summcode1():
     vibor = """select * from groups where kod = ?"""
@@ -182,9 +235,10 @@ def summcode1():
     records = cur.fetchall()
     for row in records:
         summcode.append(row[4])
-    txts.delete(0,END)
-    txts.insert(0,sum(summcode))
+    txts.delete(0, END)
+    txts.insert(0, sum(summcode))
     summcode.clear()
+
 
 def summkategor():
     vibor = """select * from groups where kategor = ?"""
@@ -198,7 +252,6 @@ def summkategor():
     summkat.clear()
 
 
-
 window = Tk()
 window.title('Учёт расходов')
 window.geometry('625x450')
@@ -208,13 +261,15 @@ tab2 = ttk.Frame(tab_control)
 tab3 = ttk.Frame(tab_control)
 tab4 = ttk.Frame(tab_control)
 tab5 = ttk.Frame(tab_control)
-text = 'Введите данные нового элемента :(1.Код 2.День/Временной промежуток 3.Категория 4.Продукт 5.Затраты)'
+text = 'Введите данные нового элемента :(1.Код 2.День/Временной промежуток 3.Категория 4.Продукт 5.Затраты)' \
+       'Удаление по коду удаляет все данные по это категории,удаление по категории работает аналогично,удаление по товару удаляет информацию по одному товару.' \
+       'При удалении заполните только используемое окно(Например для удалении по коду заполните только код)'
 tab_control.add(tab1, text='Изменение таблицы групп')
 tab_control.add(tab2, text='Сортировка по дням')
 tab_control.add(tab3, text='Информация по товару')
 tab_control.add(tab4, text='График трат')
 tab_control.add(tab5, text='Затраты')
-lbl1 = Label(tab1, text=text,bg='yellow')
+lbl1 = Label(tab1, text=text, bg='yellow')
 lbl1.grid(column=1, row=2)
 window.update()
 width = lbl1.winfo_width()
@@ -222,35 +277,43 @@ if width > 600:
     char_width = width / len(text)
     wrapped_text = '\n'.join(wrap(text, int(600 / char_width)))
     lbl1['text'] = wrapped_text
-txt = Entry(tab1, width=23,bg='yellow')
+txt = Entry(tab1, width=23, bg='yellow')
 txt.grid(column=1, rows=1)
-txt1 = Entry(tab1, width=23,bg='yellow')
+txt1 = Entry(tab1, width=23, bg='yellow')
 txt1.grid(column=1, rows=1)
-txt2 = Entry(tab1, width=23,bg='yellow')
+txt2 = Entry(tab1, width=23, bg='yellow')
 txt2.grid(column=1, rows=1)
-txt3 = Entry(tab1, width=23,bg='yellow')
+txt3 = Entry(tab1, width=23, bg='yellow')
 txt3.grid(column=1, rows=1)
-txt4 = Entry(tab1, width=23,bg='yellow')
+txt4 = Entry(tab1, width=23, bg='yellow')
 txt4.grid(column=1, rows=1)
 btn = Button(tab1, text="Добавление", command=gruppchange)
 btn.grid(column=1, row=10)
+btnd = Button(tab1, text="Удаление по коду", command=deletepokodu)
+btnd.grid(column=1, row=11)
+btnd1 = Button(tab1, text="Удаление по дню", command=deletepodnu)
+btnd1.grid(column=1, row=12)
+btnd2 = Button(tab1, text="Удаление по категории", command=deletepokat)
+btnd2.grid(column=1, row=12)
+btnd3 = Button(tab1, text="Удаление товара", command=deletetov)
+btnd3.grid(column=1, row=13)
 '''------------------------------------------'''
-lbl2 = Label(tab2,text = 'Поиск по дням и товарам', bg = 'yellow')
+lbl2 = Label(tab2, text='Поиск по дням и товарам', bg='yellow')
 lbl2.grid(column=1, row=2)
-txtk = Entry(tab2, width=23,bg='yellow')
+txtk = Entry(tab2, width=23, bg='yellow')
 txtk.grid(column=1, rows=1)
-txtk1 = Entry(tab2, width=23,bg='yellow')
+txtk1 = Entry(tab2, width=23, bg='yellow')
 txtk1.grid(column=1, rows=1)
-txtk2 = Entry(tab2, width=23,bg='yellow')
+txtk2 = Entry(tab2, width=23, bg='yellow')
 txtk2.grid(column=1, rows=1)
-lblt = Label(tab2,text ='(1,2 дни между которыми искать.3 Категория)',bg = 'yellow')
+lblt = Label(tab2, text='(1,2 дни между которыми искать.3 Категория)', bg='yellow')
 lblt.grid(column=1, row=1)
 btn1 = Button(tab2, text="Считывание", command=vivodlingr)
 btn1.grid(column=1, row=7)
 '''------------------------------------------'''
-lbl3 = Label(tab3, text = 'Введите интересующий ТОВАР', bg = 'yellow')
+lbl3 = Label(tab3, text='Введите интересующий ТОВАР', bg='yellow')
 lbl3.grid(column=1, row=1)
-txtt = Entry(tab3, width=23,bg='yellow')
+txtt = Entry(tab3, width=23, bg='yellow')
 txtt.grid(column=1, rows=1)
 btnt = Button(tab3, text="Вывод информации по товару", command=info)
 btnt.grid(column=1, row=7)
@@ -262,17 +325,18 @@ btng1.grid(column=2, row=7)
 btng2 = Button(tab4, text="Таблица", command=tablic)
 btng2.grid(column=3, row=7)
 '''--------------------------------------------'''
-lbls = Label(tab5, text = 'Конечная сумма в рублях(1.По коду 2.По категории 3.Полная сумма на данный момент)', bg = 'yellow')
+lbls = Label(tab5, text='Конечная сумма в рублях(1.По коду 2.По категории 3.Полная сумма на данный момент)',
+             bg='yellow')
 lbls.grid(column=1, row=1)
-txts = Entry(tab5, width=23,bg='yellow')
+txts = Entry(tab5, width=23, bg='yellow')
 txts.grid(column=1, rows=1)
 btns1 = Button(tab5, text="Cумма по коду", command=summcode1)
 btns1.grid(column=2, row=3)
-txts1 = Entry(tab5, width=23,bg='yellow')
+txts1 = Entry(tab5, width=23, bg='yellow')
 txts1.grid(column=1, rows=1)
 btns2 = Button(tab5, text="Сумма по категории", command=summkategor)
 btns2.grid(column=2, row=5)
-txts2 = Entry(tab5, width=23,bg='yellow')
+txts2 = Entry(tab5, width=23, bg='yellow')
 txts2.grid(column=1, rows=1)
 btns3 = Button(tab5, text="Общая сумма", command=summall1)
 btns3.grid(column=2, row=7)
