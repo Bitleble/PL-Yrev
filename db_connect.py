@@ -3,10 +3,33 @@ import sqlite3
 from tkinter import *
 from tkinter import ttk, scrolledtext
 from textwrap import wrap
+import tkinter.messagebox as mb
+
 from matplotlib import pyplot as plt
 
-# В день может быть совершена одна покупка товара из одной категории , всего дней 365 ,
-conn = sqlite3.connect('Year1.db')
+# База данных на год .
+
+a = ''
+
+
+def vv():
+    global a
+    a = str(txtv.get())
+    vetvvv.destroy()
+
+
+proverka = bool
+
+vetvvv = Tk()
+vetvvv.title('Подключение к базе данных')
+vetvvv.geometry('250x250')
+txtv = Entry(vetvvv, width=23, bg='yellow')
+txtv.grid(column=1, rows=1)
+btnv = Button(vetvvv, text="Добавление/Подключение к базе данных", command=vv)
+btnv.grid(column=1, row=10)
+vetvvv.mainloop()
+
+conn = sqlite3.connect('{}.db'.format(a))
 cur = conn.cursor()
 cur.execute("""CREATE TABLE IF NOT EXISTS groups(
    kod INT,
@@ -51,7 +74,7 @@ def deletetov():
     conn.commit()
 
 
-def shellSort(array, c):
+def shellsort(array, array1):
     n = len(array)
     k = int(math.log2(n))
     interval = 2 ** k - 1
@@ -62,31 +85,31 @@ def shellSort(array, c):
             j = i
             while j >= interval and array[j - interval] > temp:
                 array[j] = array[j - interval]
-                c[j] = c[j - interval]
+                array1[j] = array1[j - interval]
                 j -= interval
             array[j] = temp
-            c[j] = temp1
+            array1[j] = temp1
         k -= 1
         interval = 2 ** k - 1
-    return array, c
+    return array, array1
 
 
-def dub(b, c):
-    lenn = len(b)
+def dub(arr, arr1):
+    lenn = len(arr)
     for i in range(lenn):
-        if b[i] == b[i - 1]:
+        if arr[i] == arr[i - 1]:
             cswap = i - 1
-            c[cswap + 1] = c[cswap] + c[cswap + 1]
-            b[cswap] = 0
-            c[cswap] = 0
-    shellSort(b, c)
-    b.reverse()
-    c.reverse()
-    for x in b:
+            arr1[cswap + 1] = arr1[cswap] + arr1[cswap + 1]
+            arr[cswap] = 0
+            arr1[cswap] = 0
+    shellsort(arr, arr1)
+    arr.reverse()
+    arr1.reverse()
+    for x in arr:
         if x == 0:
-            b.remove(0)
-            c.remove(0)
-    return b, c
+            arr.remove(0)
+            arr1.remove(0)
+    return arr, arr1
 
 
 def gruppchange():
@@ -97,6 +120,7 @@ def gruppchange():
 
 def info():
     tovt = txtt.get()
+    proverka = False
     vetv1 = Tk()
     vetv1.title('Информация по товару')
     vetv1.geometry('400x400')
@@ -108,7 +132,11 @@ def info():
     for row in records:
         res = "Код: {}".format(row[0]) + '\n' + "Категория:{}".format(row[2]) + '\n' + '\n'
         textt.insert(1.0, res)
+        proverka = True
         break
+    if proverka != True:
+        mb.showerror(title='Ошибка', message='Такой товар не найден, проверьте написание')
+        vetv1.destroy()
     vetv1.mainloop()
 
 
@@ -116,19 +144,24 @@ def vivodlingr():
     den = int(txtk.get())
     den1 = int(txtk1.get())
     tov = txtk2.get()
+    proverka1 = False
     root = Tk()
     root.title('Сортировка по дням и категории')
     root.geometry('400x400')
     vibor = """select * from groups where Den = ? and kategor = ?"""
-    text = scrolledtext.ScrolledText(root, width=30, height=50)
-    text.grid(column=10, row=10)
+    text1 = scrolledtext.ScrolledText(root, width=30, height=50)
+    text1.grid(column=10, row=10)
     for i in range(den, den1 + 1):
         cur.execute(vibor, (i, tov))
         records = cur.fetchall()
         for row in records:
             res = "Код: {}".format(row[0]) + '\n' + "День:{}".format(row[1]) + '\n' + "Категория:{}".format(
                 row[2]) + '\n' + "Товар:{}".format(row[3]) + '\n' + '\n'
-            text.insert(1.0, res)
+            text1.insert(1.0, res)
+            proverka1 = True
+    if proverka1 != True:
+        mb.showerror(title='Ошибка', message='Не найдено товаров по введённым данным')
+        root.destroy()
     root.mainloop()
 
 
@@ -140,7 +173,7 @@ def graph1():
         for row in records:
             b.append(row[1])
             c.append(row[4])
-    shellSort(b, c)
+    shellsort(b, c)
     b.reverse()
     c.reverse()
     dub(b, c)
@@ -165,7 +198,7 @@ def graph2():
         for row in records:
             b.append(row[1])
             c.append(row[4])
-    shellSort(b, c)
+    shellsort(b, c)
     b.reverse()
     c.reverse()
     dub(b, c)
@@ -195,7 +228,7 @@ def tablic():
         for row in records:
             b.append(row[1])
             c.append(row[4])
-    shellSort(b, c)
+    shellsort(b, c)
     b.reverse()
     c.reverse()
     dub(b, c)
@@ -262,7 +295,8 @@ tab3 = ttk.Frame(tab_control)
 tab4 = ttk.Frame(tab_control)
 tab5 = ttk.Frame(tab_control)
 text = 'Введите данные нового элемента :(1.Код 2.День/Временной промежуток 3.Категория 4.Продукт 5.Затраты)' \
-       'Удаление по коду удаляет все данные по это категории,удаление по категории работает аналогично,удаление по товару удаляет информацию по одному товару.' \
+       'Удаление по коду удаляет все данные по это категории,удаление по категории работает аналогично,удаление' \
+       ' по товару удаляет информацию по одному товару.' \
        'При удалении заполните только используемое окно(Например для удалении по коду заполните только код)'
 tab_control.add(tab1, text='Изменение таблицы групп')
 tab_control.add(tab2, text='Сортировка по дням')
