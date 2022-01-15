@@ -1,10 +1,10 @@
 import math
 import sqlite3
+import pandas as pn
 from tkinter import *
 from tkinter import ttk, scrolledtext
 from textwrap import wrap
 import tkinter.messagebox as mb
-
 from matplotlib import pyplot as plt
 
 # База данных на год .
@@ -18,7 +18,15 @@ def vv():
     vetvvv.destroy()
 
 
-proverka = bool
+'''Функция для считывания имени db,для кнопки вводного ока'''
+
+
+def importxls():
+    exel = pn.read_sql('select * from groups', conn)
+    exel.to_excel('{}.xlsx'.format(a), index=False)
+
+
+'''В xlsx , для кнопки 1 вкладки основного окна,если названия одинаковы заменяет файл'''
 
 vetvvv = Tk()
 vetvvv.title('Подключение к базе данных')
@@ -74,6 +82,9 @@ def deletetov():
     conn.commit()
 
 
+'''Верхние 3 функции для удаления по данным'''
+
+
 def shellsort(array, array1):
     n = len(array)
     k = int(math.log2(n))
@@ -94,6 +105,9 @@ def shellsort(array, array1):
     return array, array1
 
 
+'''Сортировка Шелла'''
+
+
 def dub(arr, arr1):
     lenn = len(arr)
     for i in range(lenn):
@@ -112,10 +126,16 @@ def dub(arr, arr1):
     return arr, arr1
 
 
+'''Одна из функций сложения суммы по дням, складывает суммы одинаковых дней и превращает в нули дубликаты'''
+
+
 def gruppchange():
     dannie = (int(txt.get()), int(txt1.get()), txt2.get(), txt3.get(), int(txt4.get()))
     cur.execute("insert into groups VALUES(?,?,?,?,?);", dannie)
     conn.commit()
+
+
+'''Запись в бузу данных'''
 
 
 def info():
@@ -134,10 +154,13 @@ def info():
         textt.insert(1.0, res)
         proverka = True
         break
-    if proverka != True:
+    if not proverka:
         mb.showerror(title='Ошибка', message='Такой товар не найден, проверьте написание')
         vetv1.destroy()
     vetv1.mainloop()
+
+
+'''Информация по товару, для соответствующей кнопки'''
 
 
 def vivodlingr():
@@ -159,10 +182,13 @@ def vivodlingr():
                 row[2]) + '\n' + "Товар:{}".format(row[3]) + '\n' + '\n'
             text1.insert(1.0, res)
             proverka1 = True
-    if proverka1 != True:
+    if not proverka1:
         mb.showerror(title='Ошибка', message='Не найдено товаров по введённым данным')
         root.destroy()
     root.mainloop()
+
+
+'''Сортировка по дням и категориям'''
 
 
 def graph1():
@@ -190,6 +216,9 @@ def graph1():
     c.clear()
 
 
+'''График 1(Линейный)'''
+
+
 def graph2():
     vibor = """select * from groups where Den = ?"""
     for i in range(365):
@@ -213,6 +242,9 @@ def graph2():
     plt.show()
     b.clear()
     c.clear()
+
+
+'''График2(Столбчатый)'''
 
 
 def tablic():
@@ -250,6 +282,9 @@ def tablic():
     vetv2.mainloop()
 
 
+'''Таблица расходов'''
+
+
 def summall1():
     vibor = """select * from groups where Den = ?"""
     for i in range(365):
@@ -285,9 +320,11 @@ def summkategor():
     summkat.clear()
 
 
+'''3 функции для сумм'''
+
 window = Tk()
 window.title('Учёт расходов')
-window.geometry('625x450')
+window.geometry('725x425')
 tab_control = ttk.Notebook(window)
 tab1 = ttk.Frame(tab_control)
 tab2 = ttk.Frame(tab_control)
@@ -331,6 +368,8 @@ btnd2 = Button(tab1, text="Удаление по категории", command=de
 btnd2.grid(column=1, row=12)
 btnd3 = Button(tab1, text="Удаление товара", command=deletetov)
 btnd3.grid(column=1, row=13)
+btnxl = Button(tab1, text="Импорт в xlxs", command=importxls)
+btnxl.grid(column=2, row=13)
 '''------------------------------------------'''
 lbl2 = Label(tab2, text='Поиск по дням и товарам', bg='yellow')
 lbl2.grid(column=1, row=2)
