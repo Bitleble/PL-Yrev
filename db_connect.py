@@ -18,33 +18,34 @@ def vv():
     vetvvv.destroy()
 
 
-'''Функция для считывания имени db,для кнопки вводного ока'''
+'''Функция для считывания имени db,для кнопки вводного окна'''
 
 
 def importxls():
-    exel = pn.read_sql('select * from groups', conn)
-    exel.to_excel('{}.xlsx'.format(a), index=False)
+    exl = pn.read_sql('select * from groups', conn)
+    exl.to_excel('{}.xlsx'.format(a), index=False)
 
 
 '''В xlsx , для кнопки 1 вкладки основного окна,если названия одинаковы заменяет файл'''
 
 vetvvv = Tk()
+vetvvv["bg"] = '#90ee90'
 vetvvv.title('Подключение к базе данных')
 vetvvv.geometry('250x250')
 txtv = Entry(vetvvv, width=23, bg='yellow')
 txtv.grid(column=1, rows=1)
-btnv = Button(vetvvv, text="Добавление/Подключение к базе данных", command=vv)
+btnv = Button(vetvvv, text="  Добавление/Подключение к базе данных  ", command=vv)
 btnv.grid(column=1, row=10)
 vetvvv.mainloop()
 
 conn = sqlite3.connect('{}.db'.format(a))
 cur = conn.cursor()
 cur.execute("""CREATE TABLE IF NOT EXISTS groups(
-   kod INT,
-   Den INT,
-   kategor TEXT,
-   tovar TEXT,
-   zatrati INT);
+   Код INT,
+   День INT,
+   Категория TEXT,
+   Товар TEXT,
+   Расходы INT);
 """)
 conn.commit()
 b = []
@@ -55,28 +56,29 @@ summkat = []
 
 
 def deletepokodu():
-    vibort = '''delete FROM groups WHERE kod = ? '''
+    vibort = '''delete from groups where Код = ? '''
     tovt = int(txt.get())
     cur.execute(vibort, (tovt,))
     conn.commit()
 
 
 def deletepodnu():
-    vibort = '''delete FROM groups WHERE Den = ? '''
+    vibort = '''delete from groups where День = ? and Товар = ?'''
     tovt = int(txt1.get())
-    cur.execute(vibort, (tovt,))
+    tovt1 = txt3.get()
+    cur.execute(vibort, (tovt, tovt1))
     conn.commit()
 
 
 def deletepokat():
-    vibort = '''delete FROM groups WHERE kategor = ? '''
+    vibort = '''delete FROM groups where Категория = ? '''
     tovt = txt2.get()
     cur.execute(vibort, (tovt,))
     conn.commit()
 
 
 def deletetov():
-    vibort = '''delete FROM groups WHERE tovar = ? '''
+    vibort = '''delete from groups where Товар = ? '''
     tovt = txt3.get()
     cur.execute(vibort, (tovt,))
     conn.commit()
@@ -144,7 +146,8 @@ def info():
     vetv1 = Tk()
     vetv1.title('Информация по товару')
     vetv1.geometry('400x400')
-    vibort = """select * from groups where tovar = ?"""
+    vetv1["bg"] = '#90ee90'
+    vibort = """select * from groups where Товар = ?"""
     cur.execute(vibort, (tovt,))
     records = cur.fetchall()
     textt = scrolledtext.ScrolledText(vetv1, width=30, height=50)
@@ -169,9 +172,10 @@ def vivodlingr():
     tov = txtk2.get()
     proverka1 = False
     root = Tk()
+    root["bg"] = '#90ee90'
     root.title('Сортировка по дням и категории')
     root.geometry('400x400')
-    vibor = """select * from groups where Den = ? and kategor = ?"""
+    vibor = """select * from groups where День = ? and Категория = ?"""
     text1 = scrolledtext.ScrolledText(root, width=30, height=50)
     text1.grid(column=10, row=10)
     for i in range(den, den1 + 1):
@@ -192,7 +196,7 @@ def vivodlingr():
 
 
 def graph1():
-    vibor = """select * from groups where Den = ?"""
+    vibor = """select * from groups where День = ?"""
     for i in range(365):
         cur.execute(vibor, (i,))
         records = cur.fetchall()
@@ -210,7 +214,7 @@ def graph1():
     plt.title("Расходы")
     plt.xlabel('Дни года')
     plt.ylabel('Потраченная сумма в рублях')
-    plt.plot(b, c)
+    plt.plot(b, c, color='red')
     plt.show()
     b.clear()
     c.clear()
@@ -220,7 +224,7 @@ def graph1():
 
 
 def graph2():
-    vibor = """select * from groups where Den = ?"""
+    vibor = """select * from groups where День = ?"""
     for i in range(365):
         cur.execute(vibor, (i,))
         records = cur.fetchall()
@@ -251,9 +255,10 @@ def tablic():
     vetv2 = Tk()
     vetv2.title('Таблица расходов')
     vetv2.geometry('400x400')
+    vetv2["bg"] = '#90ee90'
     textt1 = scrolledtext.ScrolledText(vetv2, width=30, height=30)
     textt1.grid(column=10, row=10)
-    vibor = """select * from groups where Den = ?"""
+    vibor = """select * from groups where День = ?"""
     for i in range(365):
         cur.execute(vibor, (i,))
         records = cur.fetchall()
@@ -286,7 +291,7 @@ def tablic():
 
 
 def summall1():
-    vibor = """select * from groups where Den = ?"""
+    vibor = """select * from groups where День = ?"""
     for i in range(365):
         cur.execute(vibor, (i,))
         records = cur.fetchall()
@@ -297,7 +302,7 @@ def summall1():
 
 
 def summcode1():
-    vibor = """select * from groups where kod = ?"""
+    vibor = """select * from groups where Код = ?"""
     kod1 = int(txts.get())
     cur.execute(vibor, (kod1,))
     records = cur.fetchall()
@@ -309,7 +314,7 @@ def summcode1():
 
 
 def summkategor():
-    vibor = """select * from groups where kategor = ?"""
+    vibor = """select * from groups where Категория = ?"""
     kategor1 = txts1.get()
     cur.execute(vibor, (kategor1,))
     records1 = cur.fetchall()
@@ -358,17 +363,17 @@ txt3 = Entry(tab1, width=23, bg='yellow')
 txt3.grid(column=1, rows=1)
 txt4 = Entry(tab1, width=23, bg='yellow')
 txt4.grid(column=1, rows=1)
-btn = Button(tab1, text="Добавление", command=gruppchange)
+btn = Button(tab1, text="Добавление", command=gruppchange, bg='#90ee90')
 btn.grid(column=1, row=10)
-btnd = Button(tab1, text="Удаление по коду", command=deletepokodu)
+btnd = Button(tab1, text="Удаление по коду", command=deletepokodu, bg='#90ee90')
 btnd.grid(column=1, row=11)
-btnd1 = Button(tab1, text="Удаление по дню", command=deletepodnu)
-btnd1.grid(column=1, row=12)
-btnd2 = Button(tab1, text="Удаление по категории", command=deletepokat)
+btnd1 = Button(tab1, text="Удаление по дню+товару", command=deletepodnu, bg='#90ee90')
+btnd1.grid(column=1, row=14)
+btnd2 = Button(tab1, text="Удаление по категории", command=deletepokat, bg='#90ee90')
 btnd2.grid(column=1, row=12)
-btnd3 = Button(tab1, text="Удаление товара", command=deletetov)
+btnd3 = Button(tab1, text="Удаление товара", command=deletetov, bg='#90ee90')
 btnd3.grid(column=1, row=13)
-btnxl = Button(tab1, text="Импорт в xlxs", command=importxls)
+btnxl = Button(tab1, text="Импорт в xlxs", command=importxls, bg='#90ee90')
 btnxl.grid(column=2, row=13)
 '''------------------------------------------'''
 lbl2 = Label(tab2, text='Поиск по дням и товарам', bg='yellow')
@@ -381,21 +386,21 @@ txtk2 = Entry(tab2, width=23, bg='yellow')
 txtk2.grid(column=1, rows=1)
 lblt = Label(tab2, text='(1,2 дни между которыми искать.3 Категория)', bg='yellow')
 lblt.grid(column=1, row=1)
-btn1 = Button(tab2, text="Считывание", command=vivodlingr)
+btn1 = Button(tab2, text="Считывание", command=vivodlingr, bg='#90ee90')
 btn1.grid(column=1, row=7)
 '''------------------------------------------'''
 lbl3 = Label(tab3, text='Введите интересующий ТОВАР', bg='yellow')
 lbl3.grid(column=1, row=1)
 txtt = Entry(tab3, width=23, bg='yellow')
 txtt.grid(column=1, rows=1)
-btnt = Button(tab3, text="Вывод информации по товару", command=info)
+btnt = Button(tab3, text="Вывод информации по товару", command=info, bg='#90ee90')
 btnt.grid(column=1, row=7)
 '''-------------------------------------------'''
-btng = Button(tab4, text="Линейный график", command=graph1)
+btng = Button(tab4, text="Линейный график", command=graph1, bg='#90ee90')
 btng.grid(column=1, row=7)
-btng1 = Button(tab4, text="Столбатый график", command=graph2)
+btng1 = Button(tab4, text="Столбатый график", command=graph2, bg='#90ee90')
 btng1.grid(column=2, row=7)
-btng2 = Button(tab4, text="Таблица", command=tablic)
+btng2 = Button(tab4, text="Таблица", command=tablic, bg='#90ee90')
 btng2.grid(column=3, row=7)
 '''--------------------------------------------'''
 lbls = Label(tab5, text='Конечная сумма в рублях(1.По коду 2.По категории 3.Полная сумма на данный момент)',
@@ -403,15 +408,15 @@ lbls = Label(tab5, text='Конечная сумма в рублях(1.По ко
 lbls.grid(column=1, row=1)
 txts = Entry(tab5, width=23, bg='yellow')
 txts.grid(column=1, rows=1)
-btns1 = Button(tab5, text="Cумма по коду", command=summcode1)
+btns1 = Button(tab5, text="Cумма по коду", command=summcode1, bg='#90ee90')
 btns1.grid(column=2, row=3)
 txts1 = Entry(tab5, width=23, bg='yellow')
 txts1.grid(column=1, rows=1)
-btns2 = Button(tab5, text="Сумма по категории", command=summkategor)
+btns2 = Button(tab5, text="Сумма по категории", command=summkategor, bg='#90ee90')
 btns2.grid(column=2, row=5)
 txts2 = Entry(tab5, width=23, bg='yellow')
 txts2.grid(column=1, rows=1)
-btns3 = Button(tab5, text="Общая сумма", command=summall1)
+btns3 = Button(tab5, text="Общая сумма", command=summall1, bg='#90ee90')
 btns3.grid(column=2, row=7)
 tab_control.pack(expand=1, fill='both')
 window.mainloop()
